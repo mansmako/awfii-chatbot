@@ -1,0 +1,587 @@
+{
+  "name": "TEST - Echo Loop",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "com.twilio.messaging.inbound-message.received"
+        ]
+      },
+      "type": "n8n-nodes-base.twilioTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        288
+      ],
+      "id": "6ac6a385-0e0e-46d6-94be-1c129f0f8a36",
+      "name": "Twilio Trigger",
+      "webhookId": "1afa49eb-9942-4fcf-9157-db6291c3378f",
+      "credentials": {
+        "twilioApi": {
+          "id": "t8KnZ5wFRPPec6pX",
+          "name": "Twilio account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "add6e5db-3416-4b37-877a-59dfb7631008",
+              "name": "=phone",
+              "value": "={{ ($json.data?.from ?? $json.From ?? '').replace('whatsapp:', '') }}",
+              "type": "string"
+            },
+            {
+              "id": "d757f328-4e0d-468e-b417-07b8b9023cfe",
+              "name": "message",
+              "value": "={{ ($json.data?.body ?? $json.Body ?? '').trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        288
+      ],
+      "id": "7008f996-b6d7-4656-8624-5bfaf67096ba",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "={{ $json.phone }}",
+        "toWhatsapp": true,
+        "message": "=Hi there! Welcome to AWFII 👋",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        960,
+        0
+      ],
+      "id": "990e2cb0-2b7c-416f-ab83-648f967282ca",
+      "name": "Send an SMS/MMS/WhatsApp message",
+      "credentials": {
+        "twilioApi": {
+          "id": "t8KnZ5wFRPPec6pX",
+          "name": "Twilio account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "={{ $json.phone }}",
+        "toWhatsapp": true,
+        "message": "Commands: HELLO, HELP, BYE",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        960,
+        192
+      ],
+      "id": "b02923c4-e2f2-49e5-9d08-054e83e4118b",
+      "name": "Send an SMS/MMS/WhatsApp message1",
+      "credentials": {
+        "twilioApi": {
+          "id": "t8KnZ5wFRPPec6pX",
+          "name": "Twilio account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.message.toLowerCase() }}",
+                    "rightValue": "hello",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b5390c16-9029-4c95-a4f6-e989dbab8e99"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Hello"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "62f17d41-521d-4889-b83e-4fa171435698",
+                    "leftValue": "={{ $json.message.toLowerCase() }}",
+                    "rightValue": "help",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "help"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b4c9986f-b6ba-4e34-9d7a-d16cc0175536",
+                    "leftValue": "={{ $json.message.toLowerCase() }}",
+                    "rightValue": "bye",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "bye"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        256
+      ],
+      "id": "1c2fee56-9cec-4621-a300-b93a0fb36ef7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "={{ $('Edit Fields').item.json.phone }}",
+        "toWhatsapp": true,
+        "message": "={{ $('AI Agent').item.json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        1392,
+        576
+      ],
+      "id": "1f0c730e-3df3-486b-90ec-e9b879599c1b",
+      "name": "Send an SMS/MMS/WhatsApp message2",
+      "credentials": {
+        "twilioApi": {
+          "id": "t8KnZ5wFRPPec6pX",
+          "name": "Twilio account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "from": "+14155238886",
+        "to": "={{ $json.phone }}",
+        "toWhatsapp": true,
+        "message": "=Goodbye! Talk soon 👋",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.twilio",
+      "typeVersion": 1,
+      "position": [
+        960,
+        384
+      ],
+      "id": "7cc0cecf-a46e-4ca6-aac9-383f962b14a6",
+      "name": "Send an SMS/MMS/WhatsApp message3",
+      "credentials": {
+        "twilioApi": {
+          "id": "t8KnZ5wFRPPec6pX",
+          "name": "Twilio account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message }}",
+        "options": {
+          "systemMessage": "You are AWFII, a friendly WhatsApp financial literacy assistant for South Africans. Keep replies under 300 characters. Plain text only, no markdown. Be practical. If asked about specific investments, add a disclaimer that this is education, not financial advice."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        912,
+        576
+      ],
+      "id": "f7d37199-99db-4b8c-9a2f-6f9df13156e0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.3-70b-versatile",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        816,
+        720
+      ],
+      "id": "23a01681-9f97-44a1-ace3-282083028f0f",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "3DtGLWmC0IqKSzA4",
+          "name": "Groq account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Edit Fields').item.json.phone }}",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.4,
+      "position": [
+        976,
+        752
+      ],
+      "id": "745d6c8f-0892-4f3a-9db5-a453947246c8",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "base": {
+          "__rl": true,
+          "value": "app34W8XGrqrg1hif",
+          "mode": "list",
+          "cachedResultName": "AWFII MVP",
+          "cachedResultUrl": "https://airtable.com/app34W8XGrqrg1hif"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblxodi30TTgabvB5",
+          "mode": "list",
+          "cachedResultName": "Conversation_History",
+          "cachedResultUrl": "https://airtable.com/app34W8XGrqrg1hif/tblxodi30TTgabvB5"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Timestamp": "={{ $now.toFormat('yyyy-MM-dd HH:mm:ss') }}",
+            "Role": "assistant",
+            "Phone": "={{ $('Edit Fields').item.json.phone }}",
+            "Message": "={{ $json.output }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Message",
+              "displayName": "Message",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Role",
+              "displayName": "Role",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "user",
+                  "value": "user"
+                },
+                {
+                  "name": "assistant",
+                  "value": "assistant"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "User_State_Link",
+              "displayName": "User_State_Link",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "User_Profile_Link",
+              "displayName": "User_Profile_Link",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "array",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "typecast": true
+        }
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        1232,
+        576
+      ],
+      "id": "45035fcf-ba9d-4553-9c4c-90a170e69549",
+      "name": "Create a record",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "SEp7mJ8UcgdSA9yQ",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "app34W8XGrqrg1hif",
+          "mode": "list",
+          "cachedResultName": "AWFII MVP",
+          "cachedResultUrl": "https://airtable.com/app34W8XGrqrg1hif"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbl6rwwliliWLjYBV",
+          "mode": "list",
+          "cachedResultName": "User_States",
+          "cachedResultUrl": "https://airtable.com/app34W8XGrqrg1hif/tbl6rwwliliWLjYBV"
+        },
+        "filterByFormula": "={Phone_Number} = '{{ $('Edit Fields').item.json.phone }}'",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        448,
+        288
+      ],
+      "id": "24bdb948-e0c4-4aee-83a1-4aea11b40412",
+      "name": "Search records",
+      "credentials": {
+        "airtableTokenApi": {
+          "id": "SEp7mJ8UcgdSA9yQ",
+          "name": "Airtable Personal Access Token account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Twilio Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Search records",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send an SMS/MMS/WhatsApp message": {
+      "main": [
+        []
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Create a record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a record": {
+      "main": [
+        [
+          {
+            "node": "Send an SMS/MMS/WhatsApp message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search records": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "b90cc44e-19b6-438b-a6a9-c51763b092a2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3deac580ac2fb4e33650af8d8678ebf8fd70ae51f0234bc48cbc71e0e8d87c9f"
+  },
+  "id": "OsBjVIMlKDoCs7TO",
+  "tags": []
+}
